@@ -17,11 +17,12 @@ DEL /F/S/Q *.hex
 
 DEL /F/S/Q *.Administrator
 DEL /F/S/Q JLinkLog.txt
-DEL /F/S/Q JLinkSettings.ini
+
 DEL /F/S/Q *.scvd
 
 DEL /F/S/Q *.ncb
 attrib -h *.suo
 DEL /F/S/Q *.suo
-
 DEL /F/S/Q *.user
+
+DEL /F/S/Q *_alog.txt

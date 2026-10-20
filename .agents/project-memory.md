@@ -15,6 +15,14 @@
   恢复默认后的参数读回已于2026-10-20验证，见最新续接摘要。
 
 ## 续接摘要
+- 2026-10-20 用户新增Keil/clangd辅助脚本和uv2clangd工具，并创建公开仓库
+  https://github.com/canyan-max/DTO.git。已关联origin；已明确说明现有源码和历史含
+  4G固定鉴权后缀，用户两次确认该值可公开，授权直接推送，保留既有鉴权配置。
+  新增脚本按Git Bash语法检查（仅bash -n，不执行编译/烧录/下载工具），统一LF，
+  .gitattributes新增bash规则；.gitignore排除根build_log/flash_log/编译数据库临时文件，
+  为脚本依赖uv2clangd.exe增加保留规则。清理脚本保留用户其他改动，取消递归删除
+  csv/xlsx以免删除Docs项目表格；未执行清理、烧录或自动下载jq。
+  本轮为辅助脚本提交及GitHub同步准备，无固件源码修改，Bootload未查看。
 - 2026-10-20 用户在Application中初始化Git并提交初始.gitignore后，要求检查遗漏并
   提交整合版本。已清理旧项目无关ignore规则，取消全局忽略txt/json/表格/bat，
   保留厂商LICENSE、Docs表格、clean.bat、格式化脚本依赖的clang-format.exe；

@@ -31,6 +31,11 @@
 *.dbgconf
 JLinkLog.txt
 JLinkSettings.ini
+/build_log.txt
+/flash_log.txt
+/compile_commands.json
+/tmp.json
+*_alog.txt
 
 # Python and test caches
 __pycache__/
@@ -44,6 +49,7 @@ venv/
 # Executables: the pinned formatter is required by the project script
 *.exe
 !/clang-format.exe
+!/uv2clangd.exe
 
 # OS and editor temporary files
 .DS_Store
