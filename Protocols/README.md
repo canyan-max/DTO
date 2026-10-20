@@ -4,10 +4,10 @@ proto_local.c/.h 是唯一的本机0x14协议：继电器、版本、参数、�
 寄存器17～43连续读取，保留03/旧01/05/06/10的已支持功能。UART1/2/3在DTO和
 采集模式下都可访问完整本机协议，App/app_local应用命令并从原端口回复。
 原proto_params、proto_dto四个文件及构建项已移除。寄存器说明见
-[统一本机协议](../.agents/local-protocol.md)。
+[统一本机协议](../Docs/本机通信协议_0x14.md)。
 
 其他模块保持各自外部协议职责：
-- proto_gm800：AT+CLOUD请求解析及21步4G配置指令组包。
+- proto_gm800：AT+CLOUD请求解析、流式应答识别及23步4G配置指令组包。
 - proto_hik：海康DD/A5读数据、RAM SN写入/读回及整数数据组包。
 - proto_controller：旧EVE/SZS查询表、长度/地址/CRC校验及整数换算。
 
