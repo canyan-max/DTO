@@ -19,6 +19,21 @@
 /* private  functions  ------------------------------------------------------*/
 
 /* exported functions -------------------------------------------------------*/
+uint8_t bsp_io_preload_relays(uint8_t gpio_mask)
+{
+    if(gpio_mask > 3U)
+    {
+        return 0U;
+    }
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+    /* Boot hands these pins over as analog inputs. Set the output latches
+     * now, so MX_GPIO_Init enables the remembered level on its first drive. */
+    HAL_GPIO_WritePin(G2ROUT1_GPIO_Port, G2ROUT1_Pin,
+                      0U != (gpio_mask & 1U) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(G2ROUT2_GPIO_Port, G2ROUT2_Pin,
+                      0U != (gpio_mask & 2U) ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    return 1U;
+}
 uint8_t bsp_io_set_power(uint8_t module_4g, uint8_t rs485_1, uint8_t rs485_2)
 {
     if(module_4g > 1U || rs485_1 > 1U || rs485_2 > 1U)

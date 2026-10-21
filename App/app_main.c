@@ -38,6 +38,7 @@ static uint32_t g_led_rx_bytes[2U];
 static uint8_t  g_led_state[3U];
 static uint8_t  g_led_heartbeat;
 static uint8_t  g_led_activity[2U];
+static uint8_t  g_outputs_prepared;
 
 /* private  functions  ------------------------------------------------------*/
 static uint8_t update_indicators(void)
@@ -91,12 +92,31 @@ static uint8_t update_indicators(void)
 }
 
 /* exported functions -------------------------------------------------------*/
+uint8_t app_prepare_outputs(void)
+{
+    uint8_t gpio_mask;
+    if(0U != g_outputs_prepared)
+    {
+        return 1U;
+    }
+    svc_params_init();
+    if(0U == svc_relay_prepare_startup(&gpio_mask) ||
+       0U == bsp_io_preload_relays(gpio_mask))
+    {
+        return 0U;
+    }
+    g_outputs_prepared = 1U;
+    return 1U;
+}
 uint8_t app_init(void)
 {
     comm_params_t params;
+    if(0U == app_prepare_outputs())
+    {
+        return 0U;
+    }
     svc_boot_init();
     svc_identity_init();
-    svc_params_init();
     if(0U == svc_relay_init())
     {
         return 0U;
@@ -106,7 +126,8 @@ uint8_t app_init(void)
     {
         return 0U;
     }
-    /* Same power enables as Program; relay outputs retain CubeMX defaults. */
+    /* Same power enables as Program; relay levels retain the startup snapshot.
+     */
     if(0U == bsp_io_set_power(1U, 1U, 1U))
     {
         return 0U;

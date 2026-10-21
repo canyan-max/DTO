@@ -71,8 +71,8 @@ uint8_t bsp_uart_startup_baud(uint32_t rs485_1_baud, uint32_t rs485_2_baud)
     }
     huart2.Init.BaudRate = rs485_1_baud;
     huart3.Init.BaudRate = rs485_2_baud;
-    if(HAL_OK != HAL_RS485Ex_Init(&huart2, UART_DE_POLARITY_HIGH, 0U, 0U) ||
-       HAL_OK != HAL_RS485Ex_Init(&huart3, UART_DE_POLARITY_HIGH, 0U, 0U))
+    if(HAL_OK != HAL_RS485Ex_Init(&huart2, UART_DE_POLARITY_HIGH, 16U, 16U) ||
+       HAL_OK != HAL_RS485Ex_Init(&huart3, UART_DE_POLARITY_HIGH, 16U, 16U))
     {
         return 0U;
     }

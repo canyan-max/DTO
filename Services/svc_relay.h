@@ -42,6 +42,9 @@ typedef struct SVC_RELAY_STATUS_T
 /* variables ----------------------------------------------------------------*/
 
 /* function  ----------------------------------------------------------------*/
+/* Startup only: decode/cache memory and return GPIO bits, without driving IO.
+ */
+uint8_t svc_relay_prepare_startup(uint8_t *p_gpio_mask);
 uint8_t svc_relay_init(void);
 uint8_t svc_relay_set(uint8_t relay, uint8_t level);
 uint8_t svc_relay_task(void);

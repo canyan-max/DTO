@@ -53,7 +53,9 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOA, LED1_Pin|LED2_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, GM800FVDDEN_Pin|G2ROUT1_Pin|G2ROUT2_Pin|G2ROUT3_Pin
+  /* Relays 1/2 were preloaded from Flash before this function. Do not clear
+     their output latches before enabling output mode. Preserve after CubeMX. */
+  HAL_GPIO_WritePin(GPIOB, GM800FVDDEN_Pin|G2ROUT3_Pin
                           |G2ROUT4_Pin|VCCEN1_Pin|VCCEN2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */

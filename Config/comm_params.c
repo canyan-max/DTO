@@ -59,7 +59,7 @@ void comm_params_defaults(comm_params_t *p_params)
         p_params->uv_recover_mv      = PARAMS_DEFAULT_UV_RECOVER_MV;
         p_params->uv_enabled         = 0U;
         p_params->app_mode           = COMM_APP_MODE_DTO;
-        p_params->relay_contact_mask = 0U;
+        p_params->relay_contact_mask = 3U;
     }
 }
 

@@ -93,7 +93,7 @@ uint8_t bsp_nv_read_relays(uint64_t *p_word)
 }
 uint8_t bsp_nv_write_relays(uint64_t word)
 {
-    if(word > 3U)
+    if(word > 3U && (word & ~(uint64_t)3U) != DTO_RELAY_GPIO_RECORD)
     {
         return 0U;
     }

@@ -37,7 +37,7 @@ typedef struct COMM_PARAMS_T
     uint16_t uv_recover_mv;
     uint8_t  uv_enabled;
     uint8_t  app_mode;
-    uint8_t  relay_contact_mask; /* bit n: relay n NO=1, NC=0 */
+    uint8_t  relay_contact_mask; /* bit n: invert=1 (NC), normal=0 (NO) */
 } comm_params_t;
 
 /* variables ----------------------------------------------------------------*/

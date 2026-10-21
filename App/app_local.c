@@ -314,9 +314,21 @@ uint8_t app_local_task(void)
     }
     else
     {
-        saved = PROTO_LOCAL_ACTION_SAVE == g_action
-                    ? svc_params_save()
-                    : svc_params_save_defaults();
+        svc_relay_status_t relay;
+        /* Convert legacy relay memory before the parameter page can change
+         * inversion. A tagged physical request is valid with either mask,
+         * including power loss between the two page writes. */
+        saved = svc_relay_get_status(&relay);
+        if(0U != saved && (0U != relay.from_flash || 0U != relay.dirty))
+        {
+            saved = svc_relay_save();
+        }
+        if(0U != saved)
+        {
+            saved = PROTO_LOCAL_ACTION_SAVE == g_action
+                        ? svc_params_save()
+                        : svc_params_save_defaults();
+        }
     }
     if(0U == saved)
     {

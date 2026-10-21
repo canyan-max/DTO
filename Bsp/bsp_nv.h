@@ -26,7 +26,7 @@ extern "C"
 /* variables ----------------------------------------------------------------*/
 
 /* function  ----------------------------------------------------------------*/
-/* Legacy relay page: low two bits of one doubleword, no parameter-page write.
+/* Relay page: legacy logical bits or tagged requested GPIO bits; one word.
  */
 uint8_t bsp_nv_read_relays(uint64_t *p_word);
 uint8_t bsp_nv_write_relays(uint64_t word);

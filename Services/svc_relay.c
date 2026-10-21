@@ -27,6 +27,8 @@ static comm_params_t      g_protection_params;
 static uint32_t           g_dwell_ms;
 static uint8_t            g_dwell_active;
 static uint32_t           g_last_task_ms;
+static uint8_t            g_contact_mask;
+static uint8_t            g_startup_prepared;
 
 /* private  functions  ------------------------------------------------------*/
 static uint8_t apply_outputs(void)
@@ -37,14 +39,24 @@ static uint8_t apply_outputs(void)
     {
         return 0U;
     }
+    /* Reinterpret requests when the selected contact changes; retain the
+     * requested physical level. UV still overrides the selected load OFF. */
+    for(index = 0U; index < DTO_RELAY_COUNT; index++)
+    {
+        g_relay.requested[index] ^= (uint8_t)(((params.relay_contact_mask ^
+                                                g_contact_mask) >>
+                                               index) &
+                                              1U);
+    }
+    g_contact_mask = params.relay_contact_mask;
     for(index = 0U; index < DTO_RELAY_COUNT; index++)
     {
         uint8_t logical = 0U != g_relay.uv_active ? 0U
                                                   : g_relay.requested[index];
         uint8_t invert  = (uint8_t)((params.relay_contact_mask >> index) & 1U);
         uint8_t gpio    = logical ^ invert;
-        /* NC=0 keeps the original GPIO behavior. NO=1 inverts both manual
-         * requests and UV override through this same physical mapping. */
+        /* Normal=0 controls the NO contact; invert=1 controls the NC contact.
+         * Logical 1 connects the selected load, UV logical 0 disconnects it. */
         if(g_relay.gpio[index] != gpio)
         {
             if(0U == bsp_io_set_relay((uint8_t)index, gpio))
@@ -60,29 +72,84 @@ static uint8_t apply_outputs(void)
 }
 
 /* exported functions -------------------------------------------------------*/
-uint8_t svc_relay_init(void)
+uint8_t svc_relay_prepare_startup(uint8_t *p_gpio_mask)
 {
-    uint64_t saved;
-    uint32_t index;
+    uint64_t      saved;
+    uint32_t      index;
+    comm_params_t params;
+    if(NULL == p_gpio_mask)
+    {
+        return 0U;
+    }
+    g_startup_prepared = 0U;
+    *p_gpio_mask       = 0U;
     memset(&g_relay, 0, sizeof(g_relay));
     memset(&g_protection_params, 0, sizeof(g_protection_params));
     g_dwell_active = 0U;
     g_last_task_ms = bsp_system_time_ms();
-    /* CubeMX starts low. Default NC=0 preserves those levels; a saved NO
-     * contact setting is applied with the remembered logical request. */
-    if(0U != bsp_nv_read_relays(&saved) && saved <= 15U)
+    if(0U == svc_params_get(&params))
+    {
+        return 0U;
+    }
+    g_contact_mask = params.relay_contact_mask;
+    /* Without relay memory retain CubeMX low pins, even with inversion.
+     * NC then reports connected (1), NO disconnected (0). No auto-save. */
+    for(index = 0U; index < DTO_RELAY_COUNT; index++)
+    {
+        g_relay.requested[index] = (uint8_t)((params.relay_contact_mask >>
+                                              index) &
+                                             1U);
+    }
+    if(0U != bsp_nv_read_relays(&saved) &&
+       (saved <= 15U || (saved & ~(uint64_t)3U) == DTO_RELAY_GPIO_RECORD))
     {
         for(index = 0U; index < DTO_RELAY_COUNT; index++)
         {
             g_relay.requested[index] = (uint8_t)((saved >> index) & 1U);
+            if((saved & ~(uint64_t)3U) == DTO_RELAY_GPIO_RECORD)
+            {
+                g_relay.requested[index] ^= (uint8_t)((g_contact_mask >>
+                                                       index) &
+                                                      1U);
+            }
         }
         g_relay.from_flash = 1U;
+    }
+    for(index = 0U; index < DTO_RELAY_COUNT; index++)
+    {
+        g_relay.output[index] = g_relay.requested[index];
+        g_relay.gpio[index]   = g_relay.requested[index] ^
+                                (uint8_t)((g_contact_mask >> index) & 1U);
+        *p_gpio_mask |= (uint8_t)(g_relay.gpio[index] << index);
+    }
+    g_startup_prepared = 1U;
+    return 1U;
+}
+uint8_t svc_relay_init(void)
+{
+    uint8_t  gpio_mask;
+    uint32_t index;
+    if(0U == g_startup_prepared && 0U == svc_relay_prepare_startup(&gpio_mask))
+    {
+        return 0U;
+    }
+    g_startup_prepared = 0U;
+    g_last_task_ms     = bsp_system_time_ms();
+    /* Reassert only the cached target levels, never an intermediate low.
+     * Also supports callers that initialize without the early preload. */
+    for(index = 0U; index < DTO_RELAY_COUNT; index++)
+    {
+        g_relay.gpio[index] = 2U;
     }
     return apply_outputs();
 }
 uint8_t svc_relay_set(uint8_t relay, uint8_t level)
 {
     if(relay >= DTO_RELAY_COUNT || level > 1U)
+    {
+        return 0U;
+    }
+    if(0U == apply_outputs())
     {
         return 0U;
     }
@@ -178,10 +245,16 @@ uint8_t svc_relay_save(void)
             return 0U;
         }
     }
-    word = (uint64_t)g_relay.requested[0U] |
-           ((uint64_t)g_relay.requested[1U] << 1U);
-    if(0U != bsp_nv_read_relays(&verify) && verify <= 15U &&
-       (verify & 3U) == word)
+    if(0U == apply_outputs())
+    {
+        return 0U;
+    }
+    /* Save the request, never the temporary UV override. Tagged physical
+     * requests survive saving/restoring inversion on the separate page. */
+    word = DTO_RELAY_GPIO_RECORD | (((uint64_t)g_relay.requested[0U] |
+                                     ((uint64_t)g_relay.requested[1U] << 1U)) ^
+                                    g_contact_mask);
+    if(0U != bsp_nv_read_relays(&verify) && verify == word)
     {
         g_relay.dirty      = 0U;
         g_relay.from_flash = 1U;
@@ -201,6 +274,10 @@ uint8_t svc_relay_save(void)
 uint8_t svc_relay_get_status(svc_relay_status_t *p_status)
 {
     if(NULL == p_status)
+    {
+        return 0U;
+    }
+    if(0U == apply_outputs())
     {
         return 0U;
     }

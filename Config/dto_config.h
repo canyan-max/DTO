@@ -22,6 +22,8 @@ extern "C"
 /* define -------------------------------------------------------------------*/
 #define DTO_RELAY_COUNT (2U)
 #define DTO_RELAY_ADDRESS (0x0801F000U)
+/* Tagged low two bits store requested pin levels, independent of inversion. */
+#define DTO_RELAY_GPIO_RECORD (0x10U)
 #define DTO_UV_PROTECT_MS (3000U)
 #define DTO_UV_RECOVER_MS (3000U)
 #define DTO_LED_HEARTBEAT_MS (1000U)

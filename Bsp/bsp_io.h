@@ -26,6 +26,9 @@ extern "C"
 /* variables ----------------------------------------------------------------*/
 
 /* function  ----------------------------------------------------------------*/
+/* Before MX_GPIO_Init: enable port clock and preload ODR, without mode changes.
+ */
+uint8_t bsp_io_preload_relays(uint8_t gpio_mask);
 /* Relay index: 0..1 only. State is GPIO level, not load/contact status. */
 uint8_t bsp_io_set_relay(uint8_t relay, uint8_t enabled);
 /* Index 0=work, 1=485_1, 2=485_2. Active low LEDs. */

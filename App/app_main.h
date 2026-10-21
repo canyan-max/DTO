@@ -26,6 +26,9 @@ extern "C"
 /* variables ----------------------------------------------------------------*/
 
 /* function  ----------------------------------------------------------------*/
+/* After system clock setup, before MX_GPIO_Init; read/preload only, no Flash
+ * write. */
+uint8_t app_prepare_outputs(void);
 uint8_t app_init(void);
 uint8_t app_task(void);
 
