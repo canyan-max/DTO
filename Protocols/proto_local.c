@@ -92,9 +92,15 @@ static uint16_t register_value(uint16_t                      address,
         case 38U:
             return p_snapshot->battery.soc_percent;
         case 39U:
-            return p_snapshot->battery.remaining_10mah;
+            /* XDZ local reporting has an extra /10; retain shared cache
+             * units and the external XDZ/HIK wire formats unchanged. */
+            return COMM_APP_MODE_XDZ == p_params->app_mode
+                       ? p_snapshot->battery.remaining_10mah / 10U
+                       : p_snapshot->battery.remaining_10mah;
         case 40U:
-            return p_snapshot->battery.nominal_10mah;
+            return COMM_APP_MODE_XDZ == p_params->app_mode
+                       ? p_snapshot->battery.nominal_10mah / 10U
+                       : p_snapshot->battery.nominal_10mah;
         case 41U:
         {
             int32_t temperature;
