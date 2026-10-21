@@ -9,8 +9,9 @@ proto_local.c/.h 是唯一的本机0x14协议：继电器、版本、参数、�
 其他模块保持各自外部协议职责：
 - proto_gm800：AT+CLOUD请求解析、流式应答识别及23步4G配置指令组包。
 - proto_hik：海康DD/A5读数据、RAM SN写入/读回及整数数据组包。
+- proto_xdz：XDZ地址05双组轮询编解码、地址02/04读取区及10/0425双继电器控制建议。
 - proto_controller：旧EVE/SZS查询表、长度/地址/CRC校验及整数换算。
 
 协议仅解析/校验/组包，使用显式输入快照并输出命令建议；不访问HAL/UART句柄、
-不定义回调、不驱动GPIO/Flash、不决定端口所有权。app_mode互斥调度DTO/HIK，
+不定义回调、不驱动GPIO/Flash、不决定端口所有权。app_mode互斥调度DTO/HIK/XDZ，
 svc_params、svc_relay、svc_identity继续共用；SN仍只在RAM，不纳入56781保存。

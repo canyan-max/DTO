@@ -48,7 +48,8 @@ uint8_t svc_relay_prepare_startup(uint8_t *p_gpio_mask);
 uint8_t svc_relay_init(void);
 uint8_t svc_relay_set(uint8_t relay, uint8_t level);
 uint8_t svc_relay_task(void);
-/* Caller drains TX, suspends RX and pauses routing before Flash access. */
+/* XDZ: successful no-op, no relay Flash write. Other modes: caller drains TX,
+ * suspends RX and pauses routing before Flash access. */
 uint8_t svc_relay_save(void);
 uint8_t svc_relay_get_status(svc_relay_status_t *p_status);
 

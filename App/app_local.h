@@ -54,10 +54,16 @@ typedef struct APP_LOCAL_STATUS_T
 /* All three ports share the same local address and reply on their source. */
 app_local_result_t
 app_local_accept(comm_port_t source, const uint8_t *p_data, uint16_t length);
-uint8_t app_local_busy(void);
-uint8_t app_local_maintenance_pending(void);
-uint8_t app_local_task(void);
-uint8_t app_local_get_status(app_local_status_t *p_status);
+/* Validated external codec: set both logical requests, ACK on source, then
+ * DTO/HIK save after TX drains; XDZ replies without relay Flash access. */
+app_local_result_t app_local_reply_relay_pair(comm_port_t    source,
+                                              const uint8_t *p_reply,
+                                              uint16_t       length,
+                                              uint8_t        level);
+uint8_t            app_local_busy(void);
+uint8_t            app_local_maintenance_pending(void);
+uint8_t            app_local_task(void);
+uint8_t            app_local_get_status(app_local_status_t *p_status);
 
 #ifdef __cplusplus
 }

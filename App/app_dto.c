@@ -61,6 +61,15 @@ static uint8_t route_frame(comm_port_t source, uint32_t destination_mask)
             return 0U;
         }
     }
+    /* DTO ignores DD-prefixed frames received on either RS485 port.
+     * Drop before routing so UART1 backpressure cannot retain these frames. */
+    if(COMM_PORT_4G != source && 0U != p_pending->length &&
+       0xDDU == p_pending->data[0U])
+    {
+        g_stats.dd_uplink_dropped[source - COMM_PORT_RS485_1]++;
+        p_pending->length = 0U;
+        return 1U;
+    }
     {
         app_local_result_t local = app_local_accept(source, p_pending->data,
                                                     p_pending->length);

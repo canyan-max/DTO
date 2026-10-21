@@ -26,6 +26,7 @@ typedef struct APP_DTO_STATS_T
 {
     uint32_t downlink_queued;
     uint32_t uplink_queued[2U];
+    uint32_t dd_uplink_dropped[2U]; /* RS485 frames starting with 0xDD */
     uint32_t blocked_attempts[3U];
     uint32_t errors;
     uint32_t config_requests;

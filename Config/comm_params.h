@@ -26,6 +26,7 @@ typedef enum COMM_APP_MODE_T
 {
     COMM_APP_MODE_DTO = 0U,
     COMM_APP_MODE_HIK,
+    COMM_APP_MODE_XDZ,
     COMM_APP_MODE_NUM,
 } comm_app_mode_t;
 

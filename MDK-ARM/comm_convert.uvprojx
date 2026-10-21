@@ -714,6 +714,16 @@
               <FileType>1</FileType>
               <FilePath>../Services/svc_serial.c</FilePath>
             </File>
+            <File>
+              <FileName>svc_xdz_poll.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Services/svc_xdz_poll.c</FilePath>
+            </File>
+            <File>
+              <FileName>svc_xdz_poll.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Services/svc_xdz_poll.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -768,6 +778,16 @@
               <FileName>app_main.c</FileName>
               <FileType>1</FileType>
               <FilePath>../App/app_main.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_xdz.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../App/app_xdz.c</FilePath>
+            </File>
+            <File>
+              <FileName>app_xdz.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../App/app_xdz.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -829,6 +849,11 @@
               <FileType>5</FileType>
               <FilePath>../Config/comm_config.h</FilePath>
             </File>
+            <File>
+              <FileName>xdz_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Config/xdz_config.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -873,6 +898,16 @@
               <FileName>proto_gm800.h</FileName>
               <FileType>5</FileType>
               <FilePath>../Protocols/proto_gm800.h</FilePath>
+            </File>
+            <File>
+              <FileName>proto_xdz.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Protocols/proto_xdz.c</FilePath>
+            </File>
+            <File>
+              <FileName>proto_xdz.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>../Protocols/proto_xdz.h</FilePath>
             </File>
           </Files>
         </Group>

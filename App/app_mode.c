@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *@file               :   app_mode.c
- *@brief              :   Transfer serial ownership safely between DTO and HIK.
+ *@brief              :   Transfer serial ownership safely across DTO, HIK and XDZ.
  *@version            :   V1.0
  *@note               :   1 tab == 4 spaces!
  ******************************************************************************
@@ -11,6 +11,7 @@
 #include "app_mode.h"
 #include "app_dto.h"
 #include "app_hik.h"
+#include "app_xdz.h"
 #include "app_local.h"
 #include "bsp_system.h"
 #include "svc_gm800.h"
@@ -50,10 +51,15 @@ static void prepare_mode(comm_app_mode_t mode)
 {
     app_dto_discard_pending();
     app_hik_discard_pending();
+    app_xdz_discard_pending();
     svc_telemetry_init();
     if(COMM_APP_MODE_HIK == mode)
     {
         app_hik_init();
+    }
+    else if(COMM_APP_MODE_XDZ == mode)
+    {
+        app_xdz_init();
     }
 }
 
@@ -91,6 +97,7 @@ uint8_t app_mode_request(comm_app_mode_t mode)
     /* Drop unsent application frames; serial TX already queued is drained. */
     app_dto_discard_pending();
     app_hik_discard_pending();
+    app_xdz_discard_pending();
     svc_telemetry_invalidate();
     return 1U;
 }
@@ -103,8 +110,12 @@ uint8_t app_mode_task(void)
     comm_params_t      params;
     if(APP_MODE_ACTIVE == g_mode.state)
     {
-        return COMM_APP_MODE_DTO == g_mode.active ? app_dto_task()
-                                                  : app_hik_task();
+        if(COMM_APP_MODE_DTO == g_mode.active)
+        {
+            return app_dto_task();
+        }
+        return COMM_APP_MODE_HIK == g_mode.active ? app_hik_task()
+                                                  : app_xdz_task();
     }
     if(0U == g_failed &&
        (uint32_t)(now_ms - g_started_ms) >= COMM_MODE_SWITCH_TIMEOUT_MS)

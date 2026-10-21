@@ -16,6 +16,7 @@
 #include "svc_relay.h"
 #include "dto_config.h"
 #include "hik_config.h"
+#include "xdz_config.h"
 #include "svc_gm800.h"
 #include "svc_params.h"
 #include "svc_boot.h"
@@ -93,8 +94,10 @@ accept_local(comm_port_t source, const uint8_t *p_data, uint16_t length)
     snapshot.relay_output[1U] = relay.output[1U];
 #if COMM_APP_ENABLE_MODE
     memcpy(snapshot.version,
-           COMM_APP_MODE_HIK == current.app_mode ? HIK_FIRMWARE_VERSION
-                                                 : DTO_FIRMWARE_VERSION,
+           COMM_APP_MODE_XDZ == current.app_mode
+               ? XDZ_FIRMWARE_VERSION
+               : (COMM_APP_MODE_HIK == current.app_mode ? HIK_FIRMWARE_VERSION
+                                                        : DTO_FIRMWARE_VERSION),
            sizeof(snapshot.version));
 #elif COMM_APP_ENABLE_HIK
     memcpy(snapshot.version, HIK_FIRMWARE_VERSION, sizeof(snapshot.version));
@@ -136,7 +139,7 @@ accept_local(comm_port_t source, const uint8_t *p_data, uint16_t length)
         {
             return APP_LOCAL_ERROR;
         }
-        g_relay_save = 1U;
+        g_relay_save = COMM_APP_MODE_XDZ == current.app_mode ? 0U : 1U;
     }
     g_reply_port = source;
     if(0U == svc_serial_get_stats(g_reply_port, &stats))
@@ -151,6 +154,46 @@ accept_local(comm_port_t source, const uint8_t *p_data, uint16_t length)
     return APP_LOCAL_CONSUMED;
 }
 /* exported functions -------------------------------------------------------*/
+app_local_result_t app_local_reply_relay_pair(comm_port_t    source,
+                                              const uint8_t *p_reply,
+                                              uint16_t       length,
+                                              uint8_t        level)
+{
+    svc_serial_stats_t stats;
+    uint32_t           index;
+    comm_params_t      params;
+    if((uint32_t)source >= COMM_PORT_NUM || NULL == p_reply || 0U == length ||
+       length > sizeof(g_reply) || level > 1U)
+    {
+        return APP_LOCAL_ERROR;
+    }
+    if(0U != app_local_busy() || 0U != svc_gm800_busy())
+    {
+        return APP_LOCAL_RETRY;
+    }
+    if(0U == svc_params_get(&params) ||
+       0U == svc_serial_get_stats(source, &stats))
+    {
+        return APP_LOCAL_ERROR;
+    }
+    for(index = 0U; index < DTO_RELAY_COUNT; index++)
+    {
+        if(0U == svc_relay_set((uint8_t)index, level))
+        {
+            return APP_LOCAL_ERROR;
+        }
+    }
+    memcpy(g_reply, p_reply, length);
+    g_reply_length = length;
+    g_reply_port   = source;
+    g_action       = PROTO_LOCAL_ACTION_NONE;
+    g_relay_save   = COMM_APP_MODE_XDZ == params.app_mode ? 0U : 1U;
+    g_tx_errors    = stats.tx_errors;
+    g_started_ms   = bsp_system_time_ms();
+    g_local_status.requests++;
+    g_local_status.state = APP_LOCAL_REPLY_PENDING;
+    return APP_LOCAL_CONSUMED;
+}
 app_local_result_t
 app_local_accept(comm_port_t source, const uint8_t *p_data, uint16_t length)
 {

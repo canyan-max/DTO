@@ -145,18 +145,23 @@ uint8_t svc_relay_init(void)
 }
 uint8_t svc_relay_set(uint8_t relay, uint8_t level)
 {
+    comm_params_t params;
     if(relay >= DTO_RELAY_COUNT || level > 1U)
     {
         return 0U;
     }
-    if(0U == apply_outputs())
+    if(0U == svc_params_get(&params) || 0U == apply_outputs())
     {
         return 0U;
     }
     if(g_relay.requested[relay] != level)
     {
         g_relay.requested[relay] = level;
-        g_relay.dirty            = 1U;
+        g_relay.dirty = COMM_APP_MODE_XDZ == params.app_mode ? 0U : 1U;
+    }
+    if(COMM_APP_MODE_XDZ == params.app_mode)
+    {
+        g_relay.dirty = 0U;
     }
     return apply_outputs();
 }
@@ -229,10 +234,22 @@ uint8_t svc_relay_task(void)
 }
 uint8_t svc_relay_save(void)
 {
-    uint64_t word;
-    uint64_t verify;
-    uint16_t pending;
-    uint32_t index;
+    comm_params_t params;
+    uint64_t      word;
+    uint64_t      verify;
+    uint16_t      pending;
+    uint32_t      index;
+    if(0U == svc_params_get(&params))
+    {
+        return 0U;
+    }
+    /* XDZ controls are RAM-only, including local 05 commands and parameter
+     * maintenance. Leave any existing DTO/HIK relay record untouched. */
+    if(COMM_APP_MODE_XDZ == params.app_mode)
+    {
+        g_relay.dirty = 0U;
+        return 1U;
+    }
     if(0U != svc_gm800_busy())
     {
         return 0U;

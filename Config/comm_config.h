@@ -24,7 +24,7 @@ extern "C"
 #define COMM_UART1_BAUD_RATE (115200U)
 #define COMM_UART2_BAUD_RATE (9600U)
 #define COMM_UART3_BAUD_RATE (9600U)
-/* Production enables both implementations, with one runtime RX owner.
+/* Production enables DTO/HIK/XDZ, with one runtime RX owner.
  * Single-mode compile switches remain available for isolated bench tests. */
 #ifndef COMM_APP_ENABLE_MODE
 #define COMM_APP_ENABLE_MODE (1U)

@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *@file               :   app_mode.h
- *@brief              :   Exclusive runtime DTO and HIK mode ownership.
+ *@brief              :   Exclusive runtime DTO, HIK and XDZ mode ownership.
  *@version            :   V1.0
  *@note               :   1 tab == 4 spaces!
  ******************************************************************************
