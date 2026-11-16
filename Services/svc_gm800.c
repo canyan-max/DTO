@@ -15,6 +15,10 @@
 #include "gm800_config.h"
 #include "proto_gm800.h"
 #include "svc_serial.h"
+#include "svc_params.h"
+#if PROTO_GM800_ID_SIZE != PARAMS_CLOUD_ID_SIZE
+#error "CLOUD ID storage and protocol sizes must match"
+#endif
 /* define   -----------------------------------------------------------------*/
 
 /* typedef ------------------------------------------------------------------*/
@@ -189,6 +193,14 @@ static uint8_t consume_rx(void)
 }
 
 /* exported functions -------------------------------------------------------*/
+uint8_t svc_gm800_init(void)
+{
+    return svc_params_get_cloud_id(g_identity, sizeof(g_identity));
+}
+uint8_t svc_gm800_get_identity(char *p_identity, uint16_t capacity)
+{
+    return svc_params_get_cloud_id(p_identity, capacity);
+}
 uint8_t
 svc_gm800_start(comm_port_t source, const char *p_identity, uint16_t capacity)
 {
@@ -205,6 +217,10 @@ svc_gm800_start(comm_port_t source, const char *p_identity, uint16_t capacity)
         {
             return 0U;
         }
+    }
+    if(0U == svc_params_set_cloud_id(p_identity, capacity))
+    {
+        return 0U;
     }
     memcpy(g_identity, p_identity, PROTO_GM800_ID_SIZE);
     g_identity[PROTO_GM800_ID_SIZE] = '\0';

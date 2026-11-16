@@ -26,10 +26,12 @@ extern "C"
 #define PROTO_LOCAL_SAVE_VALUE (56781U)
 #define PROTO_LOCAL_DEFAULT_VALUE (52445U)
 #define PROTO_LOCAL_FIRST_REGISTER (17U)
-#define PROTO_LOCAL_LAST_REGISTER (43U)
-#define PROTO_LOCAL_REGISTER_COUNT (27U)
+#define PROTO_LOCAL_LAST_REGISTER (53U)
+#define PROTO_LOCAL_REGISTER_COUNT (37U)
 #define PROTO_LOCAL_VERSION_SIZE (10U)
-#define PROTO_LOCAL_MAX_REPLY (59U)
+#define PROTO_LOCAL_CLOUD_ID_FIRST_REGISTER (44U)
+#define PROTO_LOCAL_CLOUD_ID_SIZE (20U)
+#define PROTO_LOCAL_MAX_REPLY (79U)
 
 /* typedef ------------------------------------------------------------------*/
 typedef enum PROTO_LOCAL_RESULT_T
@@ -51,6 +53,7 @@ typedef struct PROTO_LOCAL_SNAPSHOT_T
     comm_params_t       params;
     uint8_t             relay_output[2U];
     uint8_t             version[PROTO_LOCAL_VERSION_SIZE];
+    char                cloud_identity[PROTO_LOCAL_CLOUD_ID_SIZE + 1U];
     comm_battery_data_t battery;
     comm_solar_data_t   solar;
     uint8_t             battery_valid;
@@ -71,9 +74,10 @@ typedef struct PROTO_LOCAL_COMMAND_T
 /* Exact 8-byte ASCII BootLoad, without CRC or line endings. */
 uint8_t  proto_local_is_boot_request(const uint8_t *p_data, uint16_t length);
 uint16_t proto_local_crc16(const uint8_t *p_data, uint16_t length);
-/* Pure codec. Reads span 17..43; legacy 01 keeps one byte per relay alias.
+/* Pure codec. Reads span 17..53; 44..53 contain 20 ASCII CLOUD ID bytes.
+ * Legacy 01 keeps one byte per relay alias.
  * Only a non-exception REPLY authorizes applying the proposed command.
- * Insufficient output space returns DROP; the largest reply needs 59 bytes. */
+ * Insufficient output space returns DROP; the largest reply needs 79 bytes. */
 proto_local_result_t
 proto_local_process(const uint8_t                *p_data,
                     uint16_t                      length,

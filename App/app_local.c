@@ -27,6 +27,9 @@
 #endif
 /* define   -----------------------------------------------------------------*/
 #define LOCAL_TRANSACTION_TIMEOUT_MS (20000U)
+#if PROTO_LOCAL_CLOUD_ID_SIZE != PARAMS_CLOUD_ID_SIZE
+#error "Local CLOUD ID registers and parameter storage sizes must match"
+#endif
 
 /* typedef ------------------------------------------------------------------*/
 
@@ -85,7 +88,9 @@ accept_local(comm_port_t source, const uint8_t *p_data, uint16_t length)
         return APP_LOCAL_RETRY;
     }
     if(0U == svc_params_get(&current) || 0U == svc_relay_get_status(&relay) ||
-       0U == svc_telemetry_get(&telemetry))
+       0U == svc_telemetry_get(&telemetry) ||
+       0U == svc_gm800_get_identity(snapshot.cloud_identity,
+                                    sizeof(snapshot.cloud_identity)))
     {
         return APP_LOCAL_ERROR;
     }

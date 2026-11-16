@@ -30,7 +30,7 @@ extern "C"
  */
 uint8_t bsp_nv_read_relays(uint64_t *p_word);
 uint8_t bsp_nv_write_relays(uint64_t word);
-/* One fixed page; p_words contains three legacy-format doublewords. */
+/* One fixed page; legacy three words followed by the CLOUD ID extension. */
 uint8_t bsp_nv_read(uint64_t *p_words, uint16_t count);
 /* Main only, quiescent communication maintenance window required.
  * Erases only PARAMS_ADDRESS. Word 2 is the final commit marker. */

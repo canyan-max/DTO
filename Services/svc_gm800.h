@@ -56,6 +56,10 @@ typedef struct SVC_GM800_STATUS_T
 /* function  ----------------------------------------------------------------*/
 /* Main-context API. Identity is exactly 20 digits; capacity includes NUL. */
 /* Raw module replies are logged to the initiating RS485 port, best effort. */
+/* Startup after svc_params_init; restores the saved ID without AT traffic. */
+uint8_t svc_gm800_init(void);
+/* 21-byte output including NUL; empty when no ID was received/saved. */
+uint8_t svc_gm800_get_identity(char *p_identity, uint16_t capacity);
 uint8_t
 svc_gm800_start(comm_port_t source, const char *p_identity, uint16_t capacity);
 uint8_t svc_gm800_busy(void);

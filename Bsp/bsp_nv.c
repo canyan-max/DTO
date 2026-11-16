@@ -43,7 +43,12 @@ write_record(uint32_t address, const uint64_t *p_words, uint16_t count)
     }
     for(index = 0U; 0U != success && index < count; index++)
     {
-        uint32_t word   = index;
+        /* Commit the legacy marker last, after the optional ID extension. */
+        uint32_t word = index;
+        if(address == PARAMS_ADDRESS && index >= 2U)
+        {
+            word = index + 1U < count ? index + 1U : 2U;
+        }
         uint32_t target = address + word * 8U;
         if(HAL_OK != HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, target,
                                        p_words[word]) ||

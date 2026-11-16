@@ -46,6 +46,15 @@ static uint16_t register_value(uint16_t                      address,
                                const proto_local_snapshot_t *p_snapshot)
 {
     const comm_params_t *p_params = &p_snapshot->params;
+    if(address >= PROTO_LOCAL_CLOUD_ID_FIRST_REGISTER &&
+       address <= PROTO_LOCAL_LAST_REGISTER)
+    {
+        uint16_t index = (uint16_t)((address -
+                                     PROTO_LOCAL_CLOUD_ID_FIRST_REGISTER) *
+                                    2U);
+        return ((uint16_t)(uint8_t)p_snapshot->cloud_identity[index] << 8U) |
+               (uint8_t)p_snapshot->cloud_identity[index + 1U];
+    }
     if(address >= 21U && address <= 25U)
     {
         uint16_t index = (uint16_t)((address - 21U) * 2U);

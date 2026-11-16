@@ -23,8 +23,12 @@ extern "C"
 /* One 2 KiB page; unchanged legacy parameter address. */
 #define PARAMS_ADDRESS (0x0801E000U)
 #define PARAMS_PAGE_SIZE (2048U)
-#define PARAMS_RECORD_WORDS (3U)
+#define PARAMS_RECORD_WORDS (7U)
 #define PARAMS_VALID_MAGIC (0x50415231U)
+/* Words 0..2 retain the legacy record. Words 3..5 store ASCII ID/padding;
+ * word 6 stores its magic/checksum. No additional Flash page is used. */
+#define PARAMS_CLOUD_ID_SIZE (20U)
+#define PARAMS_CLOUD_ID_MAGIC (0x43494431U)
 /* Legacy values, stored only until ADC/protection is migrated. */
 #define PARAMS_DEFAULT_UV_PROTECT_MV (10000U)
 #define PARAMS_DEFAULT_UV_RECOVER_MV (12000U)

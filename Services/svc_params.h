@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include "comm_params.h"
+#include "params_config.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -42,6 +43,10 @@ typedef struct SVC_PARAMS_STATUS_T
 void    svc_params_init(void);
 uint8_t svc_params_get(comm_params_t *p_params);
 uint8_t svc_params_set(const comm_params_t *p_params);
+/* Main context. Empty means no ID; a nonempty ID is exactly 20 digits.
+ * Set changes RAM only; save/defaults commit/clear it with other settings. */
+uint8_t svc_params_get_cloud_id(char *p_identity, uint16_t capacity);
+uint8_t svc_params_set_cloud_id(const char *p_identity, uint16_t capacity);
 /* Caller must pause business/RX input and drain all TX before writing.
  * Settings take effect on UARTs at next boot, not immediately. */
 uint8_t svc_params_save(void);

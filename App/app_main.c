@@ -117,6 +117,10 @@ uint8_t app_init(void)
     }
     svc_boot_init();
     svc_identity_init();
+    if(0U == svc_gm800_init())
+    {
+        return 0U;
+    }
     if(0U == svc_relay_init())
     {
         return 0U;
